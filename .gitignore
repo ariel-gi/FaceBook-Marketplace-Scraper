@@ -1,0 +1,6 @@
+node_modules/
+.venv/
+openai.env
+fb_marketplace_master_list.json
+__pycache__/
+.DS_Store

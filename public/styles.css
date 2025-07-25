@@ -1,0 +1,83 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+h2 {
+  margin-bottom: 16px;
+}
+
+#filter-controls,
+#search-controls,
+#tag-controls {
+  margin-bottom: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+input[type="number"],
+input[type="text"] {
+  margin: 0 8px 10px 0;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  padding: 6px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#search-tag-container button,
+#active-tags .tag {
+  display: inline-block;
+  margin: 4px 6px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  border: none;
+}
+
+#search-tag-container button.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+#active-tags .tag.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+tr.seen {
+  background-color: #d3d3d3;
+}
+
+a.view-link {
+  color: blue;
+  cursor: pointer;
+}

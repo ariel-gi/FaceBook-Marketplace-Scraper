@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Filtered Listings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h2>Filtered Apartment Listings</h2>
+
+  <div id="filter-controls">
+    <label for="min-price">Min Price: </label>
+    <input type="number" id="min-price" placeholder="e.g. 1000">
+
+    <label for="max-price">Max Price: </label>
+    <input type="number" id="max-price" placeholder="e.g. 3000">
+
+    <button id="apply-filter">Apply Filter</button>
+  </div>
+
+  <div id="search-controls">
+    <div id="search-tag-container"></div>
+  </div>
+
+
+  <div id="tag-controls">
+    <label for="searchtitle">Tag Filter (title must contain all tags):</label>
+    <input type="text" id="searchtitle" placeholder="Enter tag and press Enter">
+    <div id="active-tags"></div>
+  </div>
+
+  <div>
+    <label id="numberlistings"></label>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Location</th>
+        <th>Price</th>
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tbody id="listings-body"></tbody>
+  </table>
+
+  <script src="listings.js"></script>
+</body>
+</html>
