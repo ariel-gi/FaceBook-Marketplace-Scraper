@@ -128,7 +128,8 @@ def main():
         soup = BeautifulSoup(html, "html.parser")
 
         results = []
-        search_made = soup.find('input', {"aria-label": "Search Marketplace"}).get("value")
+        search_input = soup.find('input', {"aria-label": "Search Marketplace"})
+        search_made = (search_input.get("value") or "") if search_input else ""
         seen = set()
 
         for a in soup.find_all("a", href=True):

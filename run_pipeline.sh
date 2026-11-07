@@ -2,6 +2,8 @@
 
 set -e  # Exit on any error
 
+PORT="${PORT:-3001}"
+
 echo "🧠 What would you like to do?"
 echo "1) Run full pipeline (scrape, serve)"
 echo "2) Just view filtered listings (skip scraping)"
@@ -9,12 +11,15 @@ read -p "Enter 1 or 2: " choice
 
 if [ "$choice" == "1" ]; then
   echo "🚀 Step 1: Activate virtual env"
-  source .venv/bin/activate
+  if [ -d ".venv" ]; then
+    source .venv/bin/activate
+  else
+    echo "❌ .venv not found. Please create it first: python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
+    exit 1
+  fi
 
   echo "🚀 Step 2: Running scrape.py"
   python3 scrape.py
-
-  echo "⏸️ Waiting for Facebook login and scrolling..."
 
 elif [ "$choice" == "2" ]; then
   echo "📂 Skipping scraping..."
@@ -23,25 +28,23 @@ else
   exit 1
 fi
 
-echo "🌐 Step 4: Killing any previous Node servers on port 3000..."
-killall node 2>/dev/null || echo "No existing Node processes to kill."
-
-echo "🌐 Starting Node server (http://localhost:3000)..."
-node server.js &
+echo "🌐 Step 3: Starting Node server (http://localhost:${PORT})..."
+PORT=$PORT node server.js &
+NODE_PID=$!
 
 echo "🌍 Opening browser..."
 sleep 1
-open http://localhost:3000
+open "http://localhost:${PORT}"
 
 # --- Terminal remains open ---
 echo ""
-echo "🕓 Node server is running on http://localhost:3000"
+echo "🕓 Node server is running on http://localhost:${PORT} (PID: $NODE_PID)"
 echo "❌ Type 'x' and press Enter to shut down the server and exit."
 while true; do
   read -p "> " input
   if [[ "$input" == "x" ]]; then
-    echo "🛑 Shutting down Node server on port 3000..."
-    killall node 2>/dev/null || echo "No existing Node processes to kill."
+    echo "🛑 Shutting down Node server..."
+    kill "$NODE_PID" 2>/dev/null || true
     echo "👋 Exiting."
     break
   else

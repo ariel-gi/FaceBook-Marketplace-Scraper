@@ -18,7 +18,7 @@ async function loadListings() {
 }
 
 function getUniqueSearchTags(listings) {
-  return [...new Set(listings.map(listing => listing.search))];
+  return [...new Set(listings.map(listing => listing.search).filter(Boolean))];
 }
 
 function renderSearchTags(tags) {
@@ -77,8 +77,8 @@ function applyFilters() {
 
   const filtered = allListings.filter(listing => {
     const price = parsePrice(listing.price);
-    const title = listing.title.toLowerCase();
-    const location = listing.location;
+    const title = (listing.title || '').toLowerCase();
+    const location = listing.location || '';
     const search = listing.search;
 
     const matchesPrice = !isNaN(price) && price >= minPrice && price <= maxPrice;
