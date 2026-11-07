@@ -24,7 +24,7 @@ app.get('/api/listings', (req, res) => {
 
 // POST /api/mark-seen
 app.post('/api/mark-seen', (req, res) => {
-  const { link } = req.body;
+  const { link, seen } = req.body;
   if (!link) return res.status(400).json({ error: 'Missing link' });
 
   try {
@@ -32,14 +32,31 @@ app.post('/api/mark-seen', (req, res) => {
       return res.status(404).json({ error: 'No listings file found' });
     }
     const filteredListings = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+    const isSeen = seen !== undefined ? Boolean(seen) : true;
     const updatedFiltered = filteredListings.map(l =>
-      l.link === link ? { ...l, seen: true } : l
+      l.link === link ? { ...l, seen: isSeen } : l
     );
     fs.writeFileSync(DATA_FILE, JSON.stringify(updatedFiltered, null, 2), 'utf-8');
 
     res.sendStatus(200);
   } catch (e) {
     res.status(500).json({ error: 'Failed to update listing' });
+  }
+});
+
+// POST /api/mark-all-seen
+app.post('/api/mark-all-seen', (req, res) => {
+  try {
+    if (!fs.existsSync(DATA_FILE)) {
+      return res.status(404).json({ error: 'No listings file found' });
+    }
+    const filteredListings = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+    const updatedFiltered = filteredListings.map(l => ({ ...l, seen: true }));
+    fs.writeFileSync(DATA_FILE, JSON.stringify(updatedFiltered, null, 2), 'utf-8');
+
+    res.sendStatus(200);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update listings' });
   }
 });
 

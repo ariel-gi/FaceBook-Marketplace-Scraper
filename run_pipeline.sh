@@ -29,6 +29,11 @@ else
 fi
 
 echo "🌐 Step 3: Starting Node server (http://localhost:${PORT})..."
+if lsof -ti :"$PORT" >/dev/null 2>&1; then
+  echo "⚠️ Freeing port ${PORT}..."
+  kill -9 $(lsof -ti :"$PORT") 2>/dev/null || true
+  sleep 1
+fi
 PORT=$PORT node server.js &
 NODE_PID=$!
 

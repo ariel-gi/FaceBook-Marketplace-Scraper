@@ -66,8 +66,8 @@ To stop the server and exit, type `x` and press Enter in the terminal.
 
 ### 1. Scraping Mechanism (`scrape.py`)
 - **Non-Headless Playwright:** Launches a visible Chromium window so you can interact with Facebook.
-- **30-Second Login & Search Window:** Opens `https://www.facebook.com/marketplace` and waits for 30 seconds. You can log in (if needed) and type your search query into Marketplace's search input.
-- **Automated Scrolling:** Executes `scroll_down_hard()` using `page.mouse.wheel(0, scroll_amount)` with randomized pixel jumps (3,000–5,000px) and random pauses (1.5–2.5s) for up to 3 minutes (`SEARCHTIME = 180s`) to trigger Facebook's infinite scroll.
+- **Manual Login & Search Confirmation:** Opens `https://www.facebook.com/marketplace` and displays a floating guidance banner. The scraper pauses indefinitely until you log in, perform your search, and press **[ENTER]** in your terminal.
+- **Automated Scrolling & Early Exit:** Executes `scroll_down_hard()` using `page.mouse.wheel(0, scroll_amount)` with randomized pixel jumps (3,000–5,000px) and random pauses (1.5–2.5s) for up to 3 minutes (`SEARCHTIME = 180s`). You can press **ESC** in the browser window anytime to stop scrolling early and finalize the current listings.
 - **In-Memory Parsing:** Captures the full rendered DOM and parses it with BeautifulSoup:
   - Reads your active search term from Facebook's search input.
   - Finds all listing anchors matching `/marketplace/item/`.

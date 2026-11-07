@@ -2,48 +2,132 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Filtered Listings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facebook Marketplace Explorer</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h2>Filtered Apartment Listings</h2>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">Marketplace Explorer</h1>
+          <span class="app-subtitle" id="stats-summary">Loading listings...</span>
+        </div>
+      </div>
 
-  <div id="filter-controls">
-    <label for="min-price">Min Price: </label>
-    <input type="number" id="min-price" placeholder="e.g. 1000">
+      <div class="header-actions">
+        <!-- Status Filter Segmented Control -->
+        <div class="segmented-control" id="status-filter">
+          <button class="seg-btn active" data-status="all">All <span class="badge" id="count-all">0</span></button>
+          <button class="seg-btn" data-status="unseen">Unseen <span class="badge" id="count-unseen">0</span></button>
+          <button class="seg-btn" data-status="seen">Seen <span class="badge" id="count-seen">0</span></button>
+        </div>
 
-    <label for="max-price">Max Price: </label>
-    <input type="number" id="max-price" placeholder="e.g. 3000">
+        <button class="btn btn-secondary" id="btn-refresh" title="Reload listings">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+            <path d="M16 16h5v5"/>
+          </svg>
+          Refresh
+        </button>
 
-    <button id="apply-filter">Apply Filter</button>
+        <button class="btn btn-secondary" id="btn-export-csv" title="Export as CSV for Excel">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export CSV
+        </button>
+
+        <button class="btn btn-secondary" id="btn-mark-all-seen" title="Mark all current listings as seen">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Mark All Seen
+        </button>
+      </div>
+    </header>
+
+    <!-- Toolbar: Instant Search & Keyword Tags -->
+    <div class="toolbar">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input type="text" id="quick-search" placeholder="Filter by title, location, or search term..." autocomplete="off">
+        <button id="clear-search" class="clear-btn" style="display: none;" title="Clear search">✕</button>
+      </div>
+
+      <div class="tag-input-wrapper">
+        <svg class="tag-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/>
+          <path d="M7 7h.01"/>
+        </svg>
+        <input type="text" id="searchtitle" placeholder="Add keyword filter (press Enter)..." autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Dynamic Tag Containers (Only visible when active tags exist) -->
+    <div id="filter-pills-bar" class="filter-pills-bar" style="display: none;">
+      <div id="search-tag-container" class="pill-group"></div>
+      <div id="active-tags" class="pill-group"></div>
+      <button id="clear-all-tags" class="btn-text-clear" style="display: none;">Clear tags</button>
+    </div>
+
+    <!-- Dense Spreadsheet Table Container -->
+    <div class="table-wrapper">
+      <table class="dense-table" id="listings-table">
+        <thead>
+          <tr>
+            <th class="col-index">#</th>
+            <th class="col-status">Status</th>
+            <th class="col-title sortable" data-sort="title">Title <span class="sort-icon"></span></th>
+            <th class="col-price sortable" data-sort="price">Price <span class="sort-icon"></span></th>
+            <th class="col-location sortable" data-sort="location">Location <span class="sort-icon"></span></th>
+            <th class="col-search">Search Query</th>
+            <th class="col-action">Link</th>
+          </tr>
+        </thead>
+        <tbody id="listings-body">
+          <!-- Dynamically populated rows -->
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state" style="display: none;">
+        <div class="empty-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+        </div>
+        <h3 id="empty-title">No listings found</h3>
+        <p id="empty-desc">Run the scraper to fetch Facebook Marketplace items or loosen your active filters.</p>
+      </div>
+    </div>
+
+    <!-- Compact Footer / Status Bar -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span id="footer-count">0 listings showing</span>
+      </div>
+      <div class="footer-right">
+        <span>Click column headers to sort &bull; Click "View" to open and mark seen</span>
+      </div>
+    </footer>
   </div>
-
-  <div id="search-controls">
-    <div id="search-tag-container"></div>
-  </div>
-
-
-  <div id="tag-controls">
-    <label for="searchtitle">Tag Filter (title must contain all tags):</label>
-    <input type="text" id="searchtitle" placeholder="Enter tag and press Enter">
-    <div id="active-tags"></div>
-  </div>
-
-  <div>
-    <label id="numberlistings"></label>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Location</th>
-        <th>Price</th>
-        <th>Link</th>
-      </tr>
-    </thead>
-    <tbody id="listings-body"></tbody>
-  </table>
 
   <script src="listings.js"></script>
 </body>
